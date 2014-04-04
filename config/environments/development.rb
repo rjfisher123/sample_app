@@ -29,4 +29,8 @@ SampleApp::Application.configure do
 
   #migration trouble shooting idea
   Rails.env = 'development'
+
+  #in support of sprockets_better_errors gem
+  config.assets.raise_production_errors = true
+
 end
