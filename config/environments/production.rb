@@ -1,6 +1,9 @@
 SampleApp::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  #For log creation. Type "" in the console to see this
+  # config.logger = Logger.new(STDOUT)
+
   # Code is not reloaded between requests.
   config.cache_classes = true
 
@@ -59,7 +62,7 @@ SampleApp::Application.configure do
 
   # Precompile additional assets.
   # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
-  # config.assets.precompile = [ /\w+\.(?!js|css).+/, /application.(css|js)$/ ]
+  # config.assets.precompile += %w( search.js )
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
