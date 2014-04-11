@@ -39,8 +39,9 @@ describe User do
         @user.email = invalid_address
         expect(@user).not_to be_valid
       end
+    end
 	end 
-  end
+    
   describe "when email format is valid" do
     it "should be valid" do
       addresses = %w[user@foo.COM A_US-ER@f.b.org frst.lst@foo.jp a+b@baz.cn]
@@ -89,6 +90,7 @@ describe User do
     before { @user.password = @user.password_confirmation = "a" * 5 }
     it { should be_invalid }
   end
+  
   describe "return value of authenticate method" do
     before { @user.save }
     let(:found_user) { User.find_by(email: @user.email) }
