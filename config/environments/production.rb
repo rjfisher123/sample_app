@@ -2,7 +2,7 @@ SampleApp::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   #For log creation. Type "" in the console to see this
-  # config.logger = Logger.new(STDOUT)
+  config.logger = Logger.new(STDOUT)
 
   # Code is not reloaded between requests.
   config.cache_classes = true
