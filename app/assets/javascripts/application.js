@@ -15,3 +15,7 @@
 //= require bootstrap
 //= require turbolinks
 //= require_tree .
+
+$(document).on('ready page:change', function(){
+  $("#micropost_content").charCount();
+});
