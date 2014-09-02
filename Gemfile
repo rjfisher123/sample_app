@@ -10,6 +10,7 @@ gem 'bcrypt-ruby', '~> 3.0.0', :require => "bcrypt"
 gem 'faker', '1.1.2'
 gem 'will_paginate', '3.0.4'
 gem 'bootstrap-will_paginate', '0.0.9'
+gem 'friendly_id'
 group :development, :test do
 gem 'rspec-rails', '2.13.1'
 # The following optional lines are part of the advanced setup. # 

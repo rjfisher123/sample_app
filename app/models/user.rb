@@ -1,4 +1,7 @@
 class User < ActiveRecord::Base
+	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
+	extend FriendlyId
+  	friendly_id :name, use: [:slugged, :finders, :history]
 	has_many :microposts, dependent: :destroy
 	has_many :relationships, foreign_key: "follower_id", dependent: :destroy
 	has_many :followed_users, through: :relationships, source: :followed
@@ -6,10 +9,11 @@ class User < ActiveRecord::Base
                                      class_name:  "Relationship",
                                      dependent:   :destroy
 	has_many :followers, through: :reverse_relationships, source: :follower
+	has_many :replies, foreign_key: "to_id", 
+	                   class_name: "Micropost"
 	before_create :create_remember_token
 	before_save { self.email = email.downcase }
 	validates :name, presence: true, length: {maximum: 50}
-	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
 	validates :email, presence: true, format: {with: VALID_EMAIL_REGEX},
 				      uniqueness: {case_sensitive: false}
     validates :password, length: {minimum: 6}
@@ -23,7 +27,7 @@ class User < ActiveRecord::Base
 	end 
 
 	def feed
-		Micropost.from_users_followed_by(self)
+		Micropost.from_users_followed_by_including_replies(self)
 	end
 
 	def following?(other_user)
@@ -36,6 +40,17 @@ class User < ActiveRecord::Base
 
 	def unfollow!(other_user)
 		relationships.find_by(followed_id: other_user.id).destroy!
+	end
+	
+	def self.find_by_slug(slug_name)
+		all = where(slug: slug_name)
+		return nil if all.empty?
+		all.first
+	end
+
+	# Friendly_Id code to only update the url for new records
+	def should_generate_new_friendly_id?
+		new_record? || slug.blank?
 	end
 	
 	private

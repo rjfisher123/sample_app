@@ -1,7 +1,6 @@
 class UsersController < ApplicationController
   
-  before_action :signed_in_user,  only: [:index, :edit, :update, :destroy, :following, :followers]
-  # before_action :signed_out_user, only: [:new, :create]
+  before_action :signed_in_user,  only: [:index, :edit, :update, :destroy, :following, :followers, :slug]
   before_action :correct_user,    only: [:edit, :update]
   before_action :admin_user,      only: :destroy
 
@@ -10,7 +9,10 @@ class UsersController < ApplicationController
   end
 
   def show
-  	@user = User.find(params[:id])
+    @user = User.friendly.find(params[:id])
+    if request.path != user_path(@user)
+      redirect_to @user, status: :moved_permanently
+    end
     @microposts = @user.microposts.paginate(page: params[:page])
   end
 
@@ -24,7 +26,6 @@ class UsersController < ApplicationController
 
   def create
     if signed_in?
-      
       redirect_to(root_path)
     else
       @user = User.new(user_params)
@@ -54,7 +55,7 @@ class UsersController < ApplicationController
 
 
   def destroy
-    @user = User.find(params[:id])
+    @user = User.friendly.find(params[:id])
     if @user.admin?
       flash[:error] = "Invalid: Admin cannot delete itself!"
       redirect_to(root_path)
@@ -67,14 +68,14 @@ class UsersController < ApplicationController
 
   def following
       @title = "Following"
-      @user = User.find(params[:id])
+      @user = User.friendly.find(params[:id])
       @users = @user.followed_users.paginate(page: params[:page])
       render 'show_follow'
   end
   
   def followers
       @title = "Followers"
-      @user = User.find(params[:id])
+      @user = User.friendly.find(params[:id])
       @users = @user.followers.paginate(page: params[:page])
       render 'show_follow'
   end
@@ -83,13 +84,13 @@ class UsersController < ApplicationController
 
   def user_params
 		params.require(:user).permit(:name, :email, :password, 
-									               :password_confirmation)
+									               :password_confirmation, :slug)
 	end
 
   # Before filters
 
   def correct_user
-      @user = User.find(params[:id])
+      @user = User.friendly.find(params[:id])
       redirect_to(root_url) unless current_user?(@user)
   end
 
@@ -97,9 +98,6 @@ class UsersController < ApplicationController
     redirect_to(root_url) unless (current_user && current_user.admin?)
   end
 
-  # def signed_out_user
-  #   redirect_to(root_url) unless !signed_in?
-  # end
 end
 
 # 

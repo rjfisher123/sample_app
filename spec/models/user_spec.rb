@@ -6,6 +6,7 @@ describe User do
     @user = User.new(name: "Example User", email: "user@example.com",
                      password: "foobar", password_confirmation: "foobar")
   end
+  
   subject {@user}
 
   it {should respond_to(:email)}
@@ -13,18 +14,18 @@ describe User do
   it {should respond_to(:password_digest)}
   it {should respond_to(:password)}
   it {should respond_to(:password_confirmation)}
-  it { should respond_to(:remember_token) }
-  it { should respond_to(:authenticate) }
-  it { should respond_to(:admin) }
-  it { should respond_to(:microposts) }
-  it { should respond_to(:feed) }
-  it { should respond_to(:relationships) }
-  it { should respond_to(:followed_users) }
-  it { should respond_to(:reverse_relationships) }
-  it { should respond_to(:followers) }
-  it { should respond_to(:following?) }
-  it { should respond_to(:follow!) }
-  it { should respond_to(:unfollow!) }
+  it {should respond_to(:remember_token) }
+  it {should respond_to(:authenticate) }
+  it {should respond_to(:admin) }
+  it {should respond_to(:microposts) }
+  it {should respond_to(:feed) }
+  it {should respond_to(:relationships) }
+  it {should respond_to(:followed_users) }
+  it {should respond_to(:reverse_relationships) }
+  it {should respond_to(:followers) }
+  it {should respond_to(:following?) }
+  it {should respond_to(:follow!) }
+  it {should respond_to(:unfollow!) }
 
 
   it {should be_valid}
@@ -228,5 +229,26 @@ describe User do
       end
     end
   end
+
+
+  describe "handling replies" do
+     before(:each) do
+       @user = User.create!(name: "Example User", email: "user@example.com",
+                     password: "foobar", password_confirmation: "foobar")
+       @reply_to_user = FactoryGirl.create(:userToReplyTo)
+       @user_with_strange_name = FactoryGirl.create(:user, email:FactoryGirl.generate(:email), name: "Quack van Duck")
+     end
+
+     it "should be findable by slug name" do
+       user = User.find_by_slug("reply-t-user")
+       expect(user).to eq @reply_to_user
+     end
+   
+     it "should scope replies to self" do
+        m = @user.microposts.create(content:"@reply-t-user from me")
+        expect(m.to).to eq @reply_to_user
+        expect(@reply_to_user.replies).to eq [m]    
+     end
+ end
 
 end
