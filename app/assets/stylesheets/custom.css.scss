@@ -191,6 +191,10 @@ input {
   @extend .error;
 }
 
+// .alert-error {
+//   @extend .bg-danger;
+// }
+
 /* Users index */
 .users {
   list-style: none;
@@ -228,3 +232,12 @@ aside {
     height: 100px;
     margin-bottom: 5px;
 } }
+
+/* messages */
+.table {
+  margin-top: 20px;
+}
+
+.message {
+  margin-top: 20px;
+}

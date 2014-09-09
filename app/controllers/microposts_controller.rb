@@ -1,7 +1,10 @@
 class MicropostsController < ApplicationController
+	include MessageHandler
+
 	before_action :signed_in_user, only: [:create, :destroy]
 	before_action :correct_user, only: :destroy
-
+	before_action :check_if_message, only: :create
+	
 
 	def index 
 	end

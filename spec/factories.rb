@@ -17,6 +17,11 @@ FactoryGirl.define do
 	    user
 	end
 
+	factory :message do 
+		from 1
+		to 2
+		content "Just because I don't care doesn't mean I don't understand."
+	end
 
 	factory :userToReplyTo, class: User do | user |
 		user.name "Reply T User"

@@ -11,6 +11,8 @@ class User < ActiveRecord::Base
 	has_many :followers, through: :reverse_relationships, source: :follower
 	has_many :replies, foreign_key: "to_id", 
 	                   class_name: "Micropost"
+	has_many :messages, foreign_key: "from"
+	has_many :received_messages, foreign_key: "to", class_name: "Message"
 	before_create :create_remember_token
 	before_save { self.email = email.downcase }
 	validates :name, presence: true, length: {maximum: 50}
