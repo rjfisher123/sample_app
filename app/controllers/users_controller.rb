@@ -30,12 +30,17 @@ class UsersController < ApplicationController
     else
       @user = User.new(user_params)
       # puts "valid? = #{@user.valid?.inspect}"
-      if @user.save
-        sign_in @user
-        flash[:success] = "Welcome to the Sample App!"
-        redirect_to @user
-      else
-        render 'new'
+      respond_to do |format|
+        if @user.save
+          sign_in @user
+          flash[:success] = "Welcome to the Sample App!"
+          UserMailer.registration_confirmation(@user).deliver
+          format.html { redirect_to @user }
+          format.xml  { render :xml => @user, :status => :created, :location => @user }
+        else
+          format.html { render :action => "new" }
+          format.xml  { render :xml => @user.errors, :status => :unprocessable_entity }
+        end
       end
     end
   end
