@@ -1,0 +1,72 @@
+commit fe079048d958a7eee80f0840d9c28a74f4e6347d
+tree 1d4aa6f8d39303625e883f8e6046dac66a8d220f
+parent c45454ea26ea3b2a5cf8a62d2f953c2ff9fb7c5c
+author rjfisher123 <rjfisher1@gmail.com> 1410320052 -0700
+committer rjfisher123 <rjfisher1@gmail.com> 1410320052 -0700
+
+    follower-notifications
+
+diff --git a/app/controllers/users_controller.rb b/app/controllers/users_controller.rb
+index 6afaf37..c2e6e2c 100644
+--- a/app/controllers/users_controller.rb
++++ b/app/controllers/users_controller.rb
+@@ -30,12 +30,17 @@ class UsersController < ApplicationController
+     else
+       @user = User.new(user_params)
+       # puts "valid? = #{@user.valid?.inspect}"
+-      if @user.save
+-        sign_in @user
+-        flash[:success] = "Welcome to the Sample App!"
+-        redirect_to @user
+-      else
+-        render 'new'
++      respond_to do |format|
++        if @user.save
++          sign_in @user
++          flash[:success] = "Welcome to the Sample App!"
++          UserMailer.registration_confirmation(@user).deliver
++          format.html { redirect_to @user }
++          format.xml  { render :xml => @user, :status => :created, :location => @user }
++        else
++          format.html { render :action => "new" }
++          format.xml  { render :xml => @user.errors, :status => :unprocessable_entity }
++        end
+       end
+     end
+   end
+diff --git a/app/views/users/new.html.erb b/app/views/users/new.html.erb
+index 8856376..79a0af2 100644
+--- a/app/views/users/new.html.erb
++++ b/app/views/users/new.html.erb
+@@ -4,7 +4,6 @@
+ <div class="row">
+   <div class="span6 offset3">
+ 	<%= form_for (@user) do |f| %> 
+-		<%= render 'shared/error_messages', object: f.object %>
+ 		<%= render 'fields', f: f %>
+ 		<%= f.submit "Create my account", class: "btn btn-large btn-primary" %>
+ 	<% end %>
+diff --git a/config/application.rb b/config/application.rb
+index 6d39b49..3a2b716 100644
+--- a/config/application.rb
++++ b/config/application.rb
+@@ -26,6 +26,7 @@ module SampleApp
+     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
+     # config.i18n.default_locale = :de
+     # config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
++    config.autoload_paths += %W(#{config.root}/lib)
+     
+ 
+   end
+diff --git a/config/environments/development.rb b/config/environments/development.rb
+index eceebcd..76308a9 100644
+--- a/config/environments/development.rb
++++ b/config/environments/development.rb
+@@ -15,6 +15,7 @@ SampleApp::Application.configure do
+ 
+   # Don't care if the mailer can't send.
+   config.action_mailer.raise_delivery_errors = false
++  config.action_mailer.default_url_options = { :host => 'intense-oasis-8834.herokuapp.com' }
+ 
+   # Print deprecation notices to the Rails logger.
+   config.active_support.deprecation = :log
