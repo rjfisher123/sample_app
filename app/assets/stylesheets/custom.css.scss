@@ -1,9 +1,13 @@
 @import "bootstrap";
 
-
-/* mixins, variables, etc. */
-
+/* variables */
+$grayLight : #999;
 $grayMediumLight: #eaeaea;
+$grayMediumDark: #555;
+$grayDarker : #222;
+$blue: #428bca;
+
+/* mixins */
 
 @mixin box_sizing {
   -moz-box-sizing: border-box;
@@ -12,25 +16,40 @@ $grayMediumLight: #eaeaea;
 }
 
 /* universal */
+
 html {
   overflow-y: scroll;
 }
+
 body {
-  padding-top: 60px;
+  padding-top: 51px;
 }
+
 section {
   overflow: auto;
 }
+
 textarea {
   resize: vertical;
 }
+
 .center {
   text-align: center;
-  h1 {
-  margin-bottom: 10px;
-  }
+  h1 { margin-bottom: 10px }
 }
 
+.jumbotron {
+  background: rgba(0,0,0,0.1);
+  overflow: hidden;
+  padding: 40px 20px 40px;
+  margin-bottom: 20px;
+}
+
+.gravatar {
+  float: left;
+  // clear: left;
+  margin: 20px 10px 0 0;
+}
 
 /* typography */
 
@@ -54,43 +73,42 @@ h2 {
   color: $grayLight;
 }
 
-p{
-font-size: 1.1em; line-height: 1.7em;
+p {
+  font-size: 1.1em;
+  line-height: 1.7em;
 }
 
 /* header */
 
 #logo {
-  float: left;
-  margin-right: 10px;
   font-size: 1.7em;
   color: #fff;
   text-transform: uppercase;
   letter-spacing: -1px;
-  padding-top: 9px;
-  font-weight: bold;
   line-height: 1;
-  & hover {
-  color: white;
-  text-decoration: none;
+  &:hover {
+    color: #fff;
+    text-decoration: none;  
   }
 }
+
 
 /* footer */
 
 footer {
+  clear: both;
   margin-top: 45px;
   padding-top: 5px;
   border-top: 1px solid $grayMediumLight;
   color: $grayLight;
   a {
-    color: $gray;
-    & hover {
-      color: $grayDarker;
+    color: #555;
+    &:hover {
+      color: $grayDarker;    
     }
   }
-  small {
-  float: left;
+  small { 
+    float: left; 
   }
   ul {
     float: right;
@@ -103,22 +121,25 @@ footer {
 }
 
 /* miscellaneous */
+
 .debug_dump {
   clear: both;
-  float: left;
   width: 100%;
   margin-top: 45px;
   @include box_sizing;
 }
 
 /* sidebar */
+
 aside {
   section {
+
     padding: 10px 0;
-    border-top: 1px solid $grayLighter;
+    // border-top: 1px solid $grayLight;
     &:first-child {
-      border: 0;
+      // border: 0;
       padding-top: 0;
+      margin-top: 20px;
     }
     span {
       display: block;
@@ -126,30 +147,29 @@ aside {
       line-height: 1;
     }
     h1 {
-      font-size: 1.4em;
+      font-size: 1.6em;
       text-align: left;
       letter-spacing: -1px;
       margin-bottom: 3px;
       margin-top: 0px;
-    } 
+    }
+    .gravatar{
+      margin-top: 0;
+    }
   }
 }
 
-.gravatar {
-  float: left;
-  margin-right: 10px;
-}
 
-.stats { 
-  overflow: auto; 
-  a{
+.stats {
+  overflow: auto;
+  a {
     float: left;
     padding: 0 10px;
-    border-left: 1px solid $grayLighter;
+    border-left: 1px solid $grayLight;
     color: gray;
     &:first-child {
       padding-left: 0;
-      border: 0; 
+      border: 0;
     }
     &:hover {
       text-decoration: none;
@@ -157,9 +177,10 @@ aside {
     }
   }
   strong {
-  display: block;
-  } 
+    display: block;
+  }
 }
+
 .user_avatars {
   overflow: auto;
   margin-top: 10px;
@@ -169,14 +190,22 @@ aside {
 }
 
 /* forms */
-input, textarea, select, .uneditable-input {
+
+textarea, select, .uneditable-input {
   border: 1px solid #bbb;
   width: 100%;
   margin-bottom: 15px;
   @include box_sizing;
 }
+
 input {
   height: auto !important;
+  @extend .form-control;
+  margin-bottom: 10px;
+}
+
+input[type="checkbox"] {
+  margin-bottom: 10px;
 }
 
 #error_explanation {
@@ -186,52 +215,91 @@ input {
     margin: 0 0 18px 0;
   }
 }
+
 .field_with_errors {
-  @extend .control-group;
-  @extend .error;
+  @extend .has-warning;
+  label { @extend .control-label }
+  input { @extend .form-control }
+  @extend .form-group;
+  @extend .has-error;
 }
 
-// .alert-error {
-//   @extend .bg-danger;
-// }
+.alert-error {
+  @extend .bg-danger;
+}
+
+.alert-notice { 
+  @extend .bg-info;
+}
+
+.alert-alert {
+  @extend .bg-warning;
+}
+
+#micropost_countdown {
+  text-align: right;
+  color: $grayLight;
+}
+
+#follow_form { 
+margin-top: 20px;
+}
 
 /* Users index */
+
 .users {
   list-style: none;
   margin: 0;
+  padding: 0;
   li {
     overflow: auto;
     padding: 10px 0;
-    border-top: 1px solid $grayLighter;
+    border-top: 1px solid $grayLight;
     &:last-child {
-      border-bottom: 1px solid $grayLighter;
+      border-bottom: 1px solid $grayLight;
     }
-  } 
+  }
+  .gravatar {
+   margin-top: 0;
+  }
 }
 
+.username {
+  color: $grayMediumDark;
+}
+
+/* Edit users */
+.change_gravatar { 
+  .gravatar {
+    float: none;
+    display: inline;
+    margin: 10px 10px 10px 0;
+  }
+  vertical-align: middle;
+}
 /* microposts */
+
 .microposts {
   list-style: none;
   margin: 10px 0 0 0;
+  padding: 0;
+  
   li {
     padding: 10px 0;
     border-top: 1px solid #e8e8e8;
-} }
-.content {
-  display: block;
+  }
+
+  .content {
+    display: block;
+  }
+  .timestamp {
+    color: $grayLight;
+  }
+  .gravatar {
+   margin-top: 0;
+   padding-top: 3px;
+  }
 }
-.timestamp {
-  color: $grayLight;
-}
-.gravatar {
-  float: left;
-  margin-right: 10px;
-}
-aside {
-  textarea {
-    height: 100px;
-    margin-bottom: 5px;
-} }
 
 /* messages */
 .table {
@@ -241,3 +309,41 @@ aside {
 .message {
   margin-top: 20px;
 }
+
+#message_countdown { 
+  float: right;
+  color: $grayLight;
+}
+
+/* pagination */
+
+.pagination {
+  text-align: center;
+  padding: 0.3em;
+  cursor: default; }
+  .flickr_pagination a, .flickr_pagination span, .flickr_pagination em {
+    padding: 0.2em 0.5em; }
+  .flickr_pagination .disabled {
+    color: #aaaaaa; }
+  .flickr_pagination .current {
+    font-style: normal;
+    font-weight: bold;
+    color: #ff0084; }
+  .flickr_pagination a {
+    border: 1px solid #dddddd;
+    color: #0063dc;
+    text-decoration: none; }
+    .flickr_pagination a:hover, .flickr_pagination a:focus {
+      border-color: #003366;
+      background: #0063dc;
+      color: white; }
+  .flickr_pagination .page_info {
+    color: #aaaaaa;
+    padding-top: 0.8em; }
+  .flickr_pagination .previous_page, .flickr_pagination .next_page {
+    border-width: 2px; }
+  .flickr_pagination .previous_page {
+    margin-right: 1em; }
+  .flickr_pagination .next_page {
+    margin-left: 1em; }
+

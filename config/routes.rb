@@ -11,6 +11,7 @@ SampleApp::Application.routes.draw do
     get 'reply', on: :member 
     get 'sent', on: :collection
   end
+  resources :password_resets
   
   root 'static_pages#home'
   match '/signup',  to: 'users#new',              via: 'get' 

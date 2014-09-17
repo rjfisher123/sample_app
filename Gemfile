@@ -3,13 +3,15 @@ ruby '2.0.0'
 #ruby-gemset=railstutorial_rails_4_0
 gem 'rails', '4.0.0'
 gem 'pg', '0.15.1'
-gem 'bootstrap-sass', '2.3.2.0'
+gem 'pg_search'
+gem 'bootstrap-sass', '~> 3.1'
 gem 'sprockets', '2.11.0'
 # gem 'sprockets_better_errors'
 gem 'bcrypt-ruby', '~> 3.0.0', :require => "bcrypt"
 gem 'faker', '1.1.2'
 gem 'will_paginate', '3.0.4'
-gem 'bootstrap-will_paginate', '0.0.9'
+gem 'bootstrap-will_paginate'
+gem 'will_paginate-bootstrap'
 gem 'friendly_id'
 group :development, :test do
 gem 'rspec-rails', '2.13.1'

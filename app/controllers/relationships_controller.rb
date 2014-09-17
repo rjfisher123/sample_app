@@ -6,6 +6,7 @@ class RelationshipsController < ApplicationController
   def create
     @user = User.find(params[:relationship][:followed_id])
     current_user.follow!(@user)
+    @user.send_follower_notification(current_user)
     respond_with @user
   end
 

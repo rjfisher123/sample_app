@@ -5,7 +5,13 @@ class UsersController < ApplicationController
   before_action :admin_user,      only: :destroy
 
   def index
-    @users = User.paginate(page: params[:page])
+    # Chapter 9.33 Using the will_paginate gem.
+    # Note params[:page] is generated automatically by will_paginate.
+    # Default chunk size is 30 items.
+    # @users = User.paginate(page: params[:page])
+
+    # Using pg_search for full text search and kaminari gem to paginate
+    @users = User.search(params[:query]).page params[:page]
   end
 
   def show
@@ -89,7 +95,7 @@ class UsersController < ApplicationController
 
   def user_params
 		params.require(:user).permit(:name, :email, :password, 
-									               :password_confirmation, :slug)
+									               :password_confirmation, :slug, :notifications)
 	end
 
   # Before filters

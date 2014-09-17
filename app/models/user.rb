@@ -1,4 +1,13 @@
 class User < ActiveRecord::Base
+	
+	include PgSearch
+  	
+  	pg_search_scope :search_name_and_slug,
+		against: [:name, :slug, :email],
+		using: {
+		  tsearch: { prefix: true, any_word: true }
+	}
+
 	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
 	extend FriendlyId
   	friendly_id :name, use: [:slugged, :finders, :history]
@@ -50,9 +59,32 @@ class User < ActiveRecord::Base
 		all.first
 	end
 
+	def send_follower_notification(follower)
+		UserMailer.follower_notification(self, follower).deliver if notifications?
+	end
+
 	# Friendly_Id code to only update the url for new records
 	def should_generate_new_friendly_id?
 		new_record? || slug.blank?
+	end
+
+	def send_password_reset
+		token = SecureRandom.urlsafe_base64
+		update_attribute(:password_reset_token, token)
+		update_attribute(:password_reset_sent_at, Time.zone.now)
+		UserMailer.password_reset(self).deliver
+	end
+
+	def invalidate_password_reset
+		update_attribute(:password_reset_token, nil)
+	end
+
+	def self.search(query)
+		if query.present?
+			search_name_and_slug(query)
+		else
+			where(nil)
+		end
 	end
 	
 	private

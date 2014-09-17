@@ -92,15 +92,17 @@ describe "User pages" do
       sign_in user
       visit users_path
     end
+    
     it { should have_title('All users') }
     it { should have_content('All users') }
+    
     describe "pagination" do
       before(:all) { 30.times { FactoryGirl.create(:user) } }
       after(:all)  { User.delete_all }
-      it { should have_selector('div.pagination') }
+      it { should have_selector('ul.users') }
       it "should list each user" do
         User.paginate(page: 1).each do |user|
-          expect(page).to have_selector('li', text: user.name)
+          expect(page).to have_selector('li', text: user.slug)
         end
       end 
     end
@@ -126,6 +128,15 @@ describe "User pages" do
         it { should_not have_link('delete', href: user_path(admin)) }
       end
     end
+
+  describe "should return a search of users" do
+    before do
+      query = User.first.name[0..2]
+      fill_in 'query', with: query
+      click_button 'Search'
+    end
+    it { should have_content User.first.slug }
+  end
   end
 
   describe "profile page" do
@@ -166,6 +177,18 @@ describe "User pages" do
         describe "toggling the button" do
           before { click_button "Follow" }
           it { should have_xpath("//input[@value='Unfollow']") }
+        end
+
+        describe "should send follower notification to followed user" do 
+          before { click_button "Follow" }
+          specify { expect(ActionMailer::Base.deliveries.last.to).to eq [other_user.email] }
+        end
+
+        describe "should not send follower if notifications is set to false" do 
+          before { other_user.update_attribute(:notifications, false) }
+          specify do 
+            expect{ click_button "Follow" }.not_to change(ActionMailer::Base.deliveries, :count).by(1)
+          end       
         end
       end
 
