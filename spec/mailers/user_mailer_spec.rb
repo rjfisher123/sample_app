@@ -55,7 +55,7 @@ describe UserMailer do
 		end
 
 		it 'assigns @confirmation_url' do
-		  expect(mail.body.encoded).to match("http://localhost:3000/users/#{user.slug}/edit")
+		  expect(mail.body.encoded).to match("http://localhost:3000/users/#{user.id}/edit")
 		end
 	end
 
@@ -81,4 +81,28 @@ describe UserMailer do
 			expect(mail.body.encoded).to match(blinky.name)
 		end
 	end
+
+	describe 'email_confirmation' do 
+		let(:kent) { FactoryGirl.create(:unconfirmed_user, name: 'Kent Brockman') }
+		let(:mail) { kent.send_email_confirmation }
+
+		subject { mail }
+
+			it 'renders the subject' do 
+				expect(mail.subject).to match('Email confirmation')
+			end
+
+			it 'renders the receiver email' do 
+				expect(mail.to).to eq([kent.email])
+			end
+
+			it 'renders the sender email' do 
+				expect(mail.from).to eq(['rjfisher1@gmail.com'])
+			end
+
+			it 'assigns @user' do 
+				expect(mail.body.encoded).to match(kent.name)
+			end
+		end
+
 end

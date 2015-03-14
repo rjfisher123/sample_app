@@ -2,6 +2,7 @@ require 'rubygems'
 require 'spork'
 require 'factory_girl_rails'
 
+
 Spork.prefork do
   ENV["RAILS_ENV"] ||= 'test'
   require File.expand_path("../../config/environment", __FILE__)
@@ -46,6 +47,8 @@ Spork.prefork do
     # Include the Capybara DSL so that specs in spec/requests still work.
     config.include Capybara::DSL
     # Disable the old-style object.should syntax.
+    config.include FactoryGirl::Syntax::Methods
+    
     config.expect_with :rspec do |c|
       c.syntax = :expect
     end

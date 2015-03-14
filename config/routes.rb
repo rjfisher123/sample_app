@@ -20,6 +20,7 @@ SampleApp::Application.routes.draw do
   match '/help',    to: 'static_pages#help',      via: 'get' 
   match '/about',   to: 'static_pages#about',     via: 'get'
   match '/contact', to: 'static_pages#contact',   via: 'get'
+  match '/activate/:id', to: 'users#activate',    via: 'get'
   # match '/sent_messages', to: 'messages#sent', via: 'get'
 
   # The priority is based upon order of creation: first created -> highest priority.

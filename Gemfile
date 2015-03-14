@@ -8,20 +8,23 @@ gem 'bootstrap-sass', '~> 3.1'
 gem 'sprockets', '2.11.0'
 # gem 'sprockets_better_errors'
 gem 'bcrypt-ruby', '~> 3.0.0', :require => "bcrypt"
-gem 'faker', '1.1.2'
+gem 'faker'
 gem 'will_paginate', '3.0.4'
 gem 'bootstrap-will_paginate'
 gem 'will_paginate-bootstrap'
 gem 'friendly_id'
 group :development, :test do
-gem 'rspec-rails', '2.13.1'
-# The following optional lines are part of the advanced setup. # 
-gem 'guard-rspec', '2.5.0'
-gem 'spork-rails', '4.0.0'
-gem 'guard-spork', '1.5.0'
-gem 'childprocess', '0.3.6'
-gem 'debugger'
-# gem "thin"
+	gem 'rspec-rails', '2.13.1'
+	# The following optional lines are part of the advanced setup. # 
+	gem 'guard-rspec', '2.5.0'
+	gem 'spork-rails', '4.0.0'
+	gem 'guard-spork', '1.5.0'
+	gem 'childprocess', '0.3.6'
+	gem 'debugger'
+	gem 'quiet_assets'
+	gem 'pry'
+	gem 'pry-rails'
+	# gem "thin"
 end
 group :test do
   gem 'selenium-webdriver', '2.35.1'

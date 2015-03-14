@@ -9,6 +9,7 @@ end
 def valid_signup
   fill_in "Name",        	 	with: "Example User"
   fill_in "Email",        		with: "user@example.com"
+  fill_in "Username", 			with: "example-user"
   fill_in "Password",     		with: "foobar"
   fill_in "Confirm Password", 	with: "foobar"
 end

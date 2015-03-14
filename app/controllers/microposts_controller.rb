@@ -1,42 +1,38 @@
 class MicropostsController < ApplicationController
+	
+	include ReplyParser
 	include MessageHandler
 
-	before_action :signed_in_user, only: [:create, :destroy]
+	before_action :signed_in_user#, only: [:create, :destroy]
 	before_action :correct_user, only: :destroy
 	before_action :check_if_message, only: :create
 	
 
-	def index 
-	end
-	
 	def create
 		@micropost = current_user.microposts.build(micropost_params)
+
+		parse_recipient!(@micropost)
+
 		if @micropost.save
-			flash[:success] = "Micropost created!"
-			redirect_to root_url
+		  redirect_to root_url, flash: { success: 'Micropost created' }
 		else
-			@feed_items = []
-			render 'static_pages/home'
+		  @feed_items = []
+		  render 'static_pages/home'
 		end
 	end
 
 	def destroy
 		@micropost.destroy
-		redirect_to root_url
+		redirect_to root_url, flash: { success: 'Micropost deleted' }
 	end
 	
 	private
 		def micropost_params
-			params.require(:micropost).permit(:content, :to_id)
+			params.require(:micropost).permit(:content)
 		end
 
 		def correct_user
 			@micropost = current_user.microposts.find_by(id: params[:id])
 			redirect_to root_url if @micropost.nil?
 		end
-
-		def in_reply_to_id
-			params.require(:replies).permit[:content, :to_id, :in_reply_to_id, :slug]
-		end
-
 end

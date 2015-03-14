@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 describe 'Message pages' do 
-  let(:homer) { FactoryGirl.create(:user, name: 'Homer Simpson') }
-  let!(:marge) { FactoryGirl.create(:user, name: 'Marge Simpson') }
-  let!(:bart) { FactoryGirl.create(:user, name: 'Bart Simpson') }
-  let(:lisa) { FactoryGirl.create(:user, name: 'Lisa Simpson') }
+  let!(:homer) { create(:user, name: 'Homer Simpson') }
+  let!(:marge) { create(:user, name: 'Marge Simpson') }
+  let!(:bart) { create(:user, name: 'Bart Simpson') }
+  let!(:lisa) { create(:user, name: 'Lisa Simpson') }
 
   subject { page }
 
@@ -60,7 +60,7 @@ describe 'Message pages' do
 
     describe "with valid syntax and content" do 
       before do 
-        fill_in 'micropost_content', with: "d #{bart.slug} Son, when you 
+        fill_in 'micropost_content', with: "d #{bart.username} Son, when you 
         participate in sporting events, it's not whether you win or lose: it's 
         how drunk you get."
       end
@@ -72,7 +72,7 @@ describe 'Message pages' do
       end
     end
 
-    describe "with invalid username" do 
+    describe "with invalid to_id for d" do 
       before { fill_in 'micropost_content', with: "d barty hey man" }
       it "should not create a message" do 
         expect{ click_button 'Post' }.not_to change(Message, :count).by(1)
@@ -82,12 +82,12 @@ describe 'Message pages' do
       end
       describe "it should report errors" do 
         before { click_button 'Post' }
-        it { should have_content 'error'}
+        it { should have_content 'Error'}
       end
     end
 
     describe "with valid username and no content" do 
-      before { fill_in 'micropost_content', with: "d #{bart.name}   "}
+      before { fill_in 'micropost_content', with: "d #{bart.username}"}
     
       it "should not create a message" do 
         expect{ click_button 'Post' }.not_to change(Message, :count).by(1)
@@ -97,7 +97,7 @@ describe 'Message pages' do
       end
       describe "it should report errors" do 
         before { click_button 'Post' }
-        it { should have_content 'error'}
+        it { should have_content 'Error'}
       end
     end
   end

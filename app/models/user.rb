@@ -2,33 +2,38 @@ class User < ActiveRecord::Base
 	
 	include PgSearch
   	
-  	pg_search_scope :search_name_and_slug,
-		against: [:name, :slug, :email],
+  	pg_search_scope :search_name_and_username,
+		against: [:name, :username, :email],
 		using: {
 		  tsearch: { prefix: true, any_word: true }
 	}
 
-	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
-	extend FriendlyId
-  	friendly_id :name, use: [:slugged, :finders, :history]
+	VALID_EMAIL_REGEX ||= /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
+	VALID_USERNAME_REGEX = /\A(\w|-|\.)+\z/i
+	
 	has_many :microposts, dependent: :destroy
 	has_many :relationships, foreign_key: "follower_id", dependent: :destroy
 	has_many :followed_users, through: :relationships, source: :followed
 	has_many :reverse_relationships, foreign_key: "followed_id",
                                      class_name:  "Relationship",
                                      dependent:   :destroy
-	has_many :followers, through: :reverse_relationships, source: :follower
+	# Chap 11: source: follower can be omitted, since Rails will infer a source
+	# of :follower and hence look up follower_id in this case.
+	has_many :followers, through: :reverse_relationships#, source: :follower
 	has_many :replies, foreign_key: "to_id", 
 	                   class_name: "Micropost"
 	has_many :messages, foreign_key: "from"
 	has_many :received_messages, foreign_key: "to", class_name: "Message"
-	before_create :create_remember_token
-	before_save { self.email = email.downcase }
-	validates :name, presence: true, length: {maximum: 50}
+	before_create :create_remember_token, :create_email_verification_token
+	# after_create :send_email_confirmation
+	before_save { self.email.downcase! }
+	validates :name, presence: true , length: {maximum: 50}
 	validates :email, presence: true, format: {with: VALID_EMAIL_REGEX},
 				      uniqueness: {case_sensitive: false}
     validates :password, length: {minimum: 6}
 	has_secure_password
+	validates :username, presence: true, length: { maximum: 15 }, 
+	          format: { with: VALID_USERNAME_REGEX }, uniqueness: true
 
 	def User.new_remember_token
 		SecureRandom.urlsafe_base64
@@ -38,7 +43,11 @@ class User < ActiveRecord::Base
 	end 
 
 	def feed
-		Micropost.from_users_followed_by_including_replies(self)
+		Micropost.where('user_id = ?', id)
+	end
+
+	def feed
+		Micropost.feed_for_user(self)
 	end
 
 	def following?(other_user)
@@ -52,25 +61,13 @@ class User < ActiveRecord::Base
 	def unfollow!(other_user)
 		relationships.find_by(followed_id: other_user.id).destroy!
 	end
-	
-	def self.find_by_slug(slug_name)
-		all = where(slug: slug_name)
-		return nil if all.empty?
-		all.first
-	end
 
 	def send_follower_notification(follower)
 		UserMailer.follower_notification(self, follower).deliver if notifications?
 	end
 
-	# Friendly_Id code to only update the url for new records
-	def should_generate_new_friendly_id?
-		new_record? || slug.blank?
-	end
-
 	def send_password_reset
-		token = SecureRandom.urlsafe_base64
-		update_attribute(:password_reset_token, token)
+		update_attribute(:password_reset_token, User.new_remember_token)
 		update_attribute(:password_reset_sent_at, Time.zone.now)
 		UserMailer.password_reset(self).deliver
 	end
@@ -81,14 +78,30 @@ class User < ActiveRecord::Base
 
 	def self.search(query)
 		if query.present?
-			search_name_and_slug(query)
+			search_name_and_username(query)
 		else
 			where(nil)
 		end
 	end
+
+	def send_email_confirmation
+		UserMailer.email_confirmation(self).deliver
+	end
+
+	def send_registration_confirmation
+		UserMailer.registration_confirmation(self).deliver
+	end
+
+	def set_active
+		update_attribute(:active, true)
+	end
 	
 	private
 	  	
+	  	def create_email_verification_token
+			self.email_verification_token = User.new_remember_token
+		end
+
 	  	def create_remember_token
 			self.remember_token = User.encrypt(User.new_remember_token)
 		end

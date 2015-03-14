@@ -1,12 +1,14 @@
 require File.expand_path('../boot', __FILE__)
 
 # Pick the frameworks you want:
+require 'active_model/railtie'
 require "active_record/railtie"
 require "action_controller/railtie"
 require "action_mailer/railtie"
 require "sprockets/railtie"
 require 'rails/all'
 # require "rails/test_unit/railtie"
+
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -27,7 +29,15 @@ module SampleApp
     # config.i18n.default_locale = :de
     # config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
     config.autoload_paths += %W(#{config.root}/lib)
-    
+    config.quiet_assets = false
+    config.filter_parameters += [:password]
+    config.log_tags = [:host]
+    unless Rails.env.test?
+      log_level = String(ENV['LOG_LEVEL'] || "info").upcase
+      config.logger = Logger.new(STDOUT)
+      config.logger.level = Logger.const_get(log_level)
+      config.log_level = log_level
+    end
 
   end
 end

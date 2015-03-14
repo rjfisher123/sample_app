@@ -1,8 +1,11 @@
 class UsersController < ApplicationController
   
-  before_action :signed_in_user,  only: [:index, :edit, :update, :destroy, :following, :followers, :slug]
+  before_action :signed_in_user,  only: [:index, :edit, :update, :destroy, :following, :followers]
   before_action :correct_user,    only: [:edit, :update]
   before_action :admin_user,      only: :destroy
+  before_action :set_user, only: [:show, :edit, :update, :destroy,
+  :following, :followers]
+  before_action :no_signed_in_user, only: [:new, :create]
 
   def index
     # Chapter 9.33 Using the will_paginate gem.
@@ -15,7 +18,7 @@ class UsersController < ApplicationController
   end
 
   def show
-    @user = User.friendly.find(params[:id])
+    @user = User.find(params[:id])
     if request.path != user_path(@user)
       redirect_to @user, status: :moved_permanently
     end
@@ -35,12 +38,12 @@ class UsersController < ApplicationController
       redirect_to(root_path)
     else
       @user = User.new(user_params)
-      # puts "valid? = #{@user.valid?.inspect}"
       respond_to do |format|
         if @user.save
           sign_in @user
-          flash[:success] = "Welcome to the Sample App!"
-          UserMailer.registration_confirmation(@user).deliver
+          @user.send_email_confirmation
+          flash[:success] = "Welcome to the Sample App! Please check your email to activate your account." 
+          # UserMailer.registration_confirmation(@user).deliver
           format.html { redirect_to @user }
           format.xml  { render :xml => @user, :status => :created, :location => @user }
         else
@@ -66,42 +69,47 @@ class UsersController < ApplicationController
 
 
   def destroy
-    @user = User.friendly.find(params[:id])
+    @user = User.find(params[:id])
     if @user.admin?
       flash[:error] = "Invalid: Admin cannot delete itself!"
       redirect_to(root_path)
     else
       @user.destroy
-      flash[:success] = "User destroyed."
+      flash[:success] = "Deleted user: #{@user.name}"
       redirect_to users_url
     end
   end
 
   def following
       @title = "Following"
-      @user = User.friendly.find(params[:id])
+      # @user = User.find(params[:id])
       @users = @user.followed_users.paginate(page: params[:page])
       render 'show_follow'
   end
   
   def followers
       @title = "Followers"
-      @user = User.friendly.find(params[:id])
+      @user = User.find(params[:id])
       @users = @user.followers.paginate(page: params[:page])
       render 'show_follow'
+  end
+
+  def activate
+    @user = User.find_by_email_verification_token(params[:id])
+    @user.set_active if @user
   end
 
   private
 
   def user_params
 		params.require(:user).permit(:name, :email, :password, 
-									               :password_confirmation, :slug, :notifications)
+			:password_confirmation, :username, :notifications)
 	end
 
   # Before filters
 
   def correct_user
-      @user = User.friendly.find(params[:id])
+      @user = User.find(params[:id])
       redirect_to(root_url) unless current_user?(@user)
   end
 
@@ -109,6 +117,12 @@ class UsersController < ApplicationController
     redirect_to(root_url) unless (current_user && current_user.admin?)
   end
 
-end
+  def set_user
+    @user = User.find(params[:id])
+  end
 
-# 
+  def no_signed_in_user
+    redirect_to root_url if signed_in?
+  end
+
+end 
