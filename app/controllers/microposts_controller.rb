@@ -25,6 +25,14 @@ class MicropostsController < ApplicationController
 		@micropost.destroy
 		redirect_to root_url, flash: { success: 'Micropost deleted' }
 	end
+
+	def show
+		# @micropost = current_user.id.micropost_params(:id)
+	    @micropost = Micropost.find(params[:id])
+	    # if request.path != user_path(@user)
+	    #   redirect_to @user, status: :moved_permanently
+	    # end
+	end
 	
 	private
 		def micropost_params

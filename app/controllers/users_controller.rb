@@ -3,7 +3,7 @@ class UsersController < ApplicationController
   before_action :signed_in_user,  only: [:index, :edit, :update, :destroy, :following, :followers]
   before_action :correct_user,    only: [:edit, :update]
   before_action :admin_user,      only: :destroy
-  before_action :set_user, only: [:show, :edit, :update, :destroy,
+  before_action :set_user, only: [ :edit, :update, :destroy, :show,
   :following, :followers]
   before_action :no_signed_in_user, only: [:new, :create]
 
@@ -22,7 +22,12 @@ class UsersController < ApplicationController
     if request.path != user_path(@user)
       redirect_to @user, status: :moved_permanently
     end
+    
     @microposts = @user.microposts.paginate(page: params[:page])
+  end
+
+  def micropost_feed
+    @user = User.find(params[:user_id])
   end
 
   def new

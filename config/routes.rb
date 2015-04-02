@@ -2,10 +2,11 @@ SampleApp::Application.routes.draw do
   resources :users do
     member do
       get :following, :followers
+      get :micropost_feed
     end 
   end
   resources :sessions, only: [:new, :create, :destroy]
-  resources :microposts, only: [:create, :destroy]
+  resources :microposts, only: [:create, :destroy, :show]
   resources :relationships, only: [:create, :destroy]
   resources :messages, only: [:new, :create, :index, :show, :destroy] do 
     get 'reply', on: :member 
@@ -20,7 +21,14 @@ SampleApp::Application.routes.draw do
   match '/help',    to: 'static_pages#help',      via: 'get' 
   match '/about',   to: 'static_pages#about',     via: 'get'
   match '/contact', to: 'static_pages#contact',   via: 'get'
+  match '/feed',    to: 'static_pages#home',      via: 'get', :defaults => { :format => 'rss' }
+  match '/micropost_feed',    to: 'users#micropost_feed',   via: 'get', :defaults => { :format => 'atom' }
   match '/activate/:id', to: 'users#activate',    via: 'get'
+  
+  # match '/feed' => 'news_items#feed',
+  #     :as => :feed,
+  #     :defaults => { :format => 'atom' }
+
   # match '/sent_messages', to: 'messages#sent', via: 'get'
 
   # The priority is based upon order of creation: first created -> highest priority.
