@@ -1,3 +1,6 @@
+require 'api_constraints'
+
+
 SampleApp::Application.routes.draw do
   resources :users do
     member do
@@ -25,6 +28,18 @@ SampleApp::Application.routes.draw do
   match '/micropost_feed',    to: 'users#micropost_feed',   via: 'get', :defaults => { :format => 'atom' }
   match '/activate/:id', to: 'users#activate',    via: 'get'
   
+  namespace :api, defaults: { format: 'json' } do
+    scope module: :v1, constraints: ApiConstraints.new(version: 1, default: :true) do
+      resources :users do
+        member do
+          get :following, :followers
+        end
+      end
+      resources :relationships, only: [:create, :destroy]
+      resources :microposts, only: [:create, :destroy]
+      match '/feed', to: 'users#feed', via: 'get'
+    end
+  end
   # match '/feed' => 'news_items#feed',
   #     :as => :feed,
   #     :defaults => { :format => 'atom' }

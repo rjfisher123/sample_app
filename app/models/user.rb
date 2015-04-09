@@ -24,6 +24,7 @@ class User < ActiveRecord::Base
 	                   class_name: "Micropost"
 	has_many :messages, foreign_key: "from"
 	has_many :received_messages, foreign_key: "to", class_name: "Message"
+	has_one :api_key
 	before_create :create_remember_token, :create_email_verification_token
 	# after_create :send_email_confirmation
 	before_save { self.email.downcase! }

@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  
+  respond_to :html, :xml, :json, :atom
   before_action :signed_in_user,  only: [:index, :edit, :update, :destroy, :following, :followers]
   before_action :correct_user,    only: [:edit, :update]
   before_action :admin_user,      only: :destroy
@@ -15,6 +15,7 @@ class UsersController < ApplicationController
 
     # Using pg_search for full text search and kaminari gem to paginate
     @users = User.search(params[:query]).page params[:page]
+    respond_with(@users)
   end
 
   def show
@@ -23,11 +24,12 @@ class UsersController < ApplicationController
       redirect_to @user, status: :moved_permanently
     end
     
-    @microposts = @user.microposts.paginate(page: params[:page])
+    # @microposts = @user.microposts.paginate(page: params[:page])
   end
 
   def micropost_feed
     @user = User.find(params[:user_id])
+    respond_with(@user)
   end
 
   def new
@@ -35,6 +37,7 @@ class UsersController < ApplicationController
       redirect_to(root_path)
     else
       @user = User.new
+      respond_with(@user)
     end
   end
 
@@ -43,19 +46,25 @@ class UsersController < ApplicationController
       redirect_to(root_path)
     else
       @user = User.new(user_params)
-      respond_to do |format|
-        if @user.save
-          sign_in @user
-          @user.send_email_confirmation
-          flash[:success] = "Welcome to the Sample App! Please check your email to activate your account." 
-          # UserMailer.registration_confirmation(@user).deliver
-          format.html { redirect_to @user }
-          format.xml  { render :xml => @user, :status => :created, :location => @user }
-        else
-          format.html { render :action => "new" }
-          format.xml  { render :xml => @user.errors, :status => :unprocessable_entity }
-        end
+      flash[:success] = 'Welcome to the Sample App! Please check your email to activate your account.' 
+      if @user.save
+        sign_in @user
+        @user.send_email_confirmation
       end
+      respond_with(@user)
+      # respond_to do |format|
+      #   if @user.save
+      #     sign_in @user
+      #     @user.send_email_confirmation
+      #     flash[:success] = "Welcome to the Sample App! Please check your email to activate your account." 
+      #     # UserMailer.registration_confirmation(@user).deliver
+      #     format.html { redirect_to @user }
+      #     format.xml  { render :xml => @user, :status => :created, :location => @user }
+      #   else
+      #     format.html { render :action => "new" }
+      #     format.xml  { render :xml => @user.errors, :status => :unprocessable_entity }
+      #   end
+      # end
     end
   end
 
@@ -71,7 +80,6 @@ class UsersController < ApplicationController
       render 'edit'
     end
   end
-
 
   def destroy
     @user = User.find(params[:id])

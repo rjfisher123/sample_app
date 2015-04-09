@@ -21,9 +21,9 @@
 			<%= link_to "Atom Feed", micropost_feed_path(user_id: @user.id) %>
 			<!-- <%= link_to "RSS feed", params.merge(:format => :rss), :class => "feed_link" %> -->
 			<ol class="microposts">
-				<%= render @microposts %> 
+				<%= render @user.microposts %> 
 			</ol>
-			<%= will_paginate @microposts %> 
+			<%= @user.microposts.paginate(page: params[:page])%> 
 		<% end %>
 	</div>
 </div>
