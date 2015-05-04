@@ -24,6 +24,7 @@ group :development, :test do
 	gem 'quiet_assets'
 	gem 'pry'
 	gem 'pry-rails'
+	gem 'dotenv-rails'
 	# gem "thin"
 end
 group :test do
